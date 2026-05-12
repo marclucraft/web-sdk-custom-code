@@ -7,6 +7,52 @@
   <meta name=viewport content="width=device-width,initial-scale=1">
   <link rel=stylesheet href=styles.css>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- OneSignal Web SDK initialisation -->
+
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.init({
+        appId: "209ed145-8242-4226-b54c-dc53950851f7",
+        // safari_web_id: "web.onesignal.auto.2b0cd0f2-3d64-4a96-b6d2-c215d89cc9e7",
+        serviceWorkerPath: "web-sdk-custom-code/onesignal-worker.js",
+        serviceWorkerUpdaterPath: "web-sdk-custom-code/onesignal-updater-worker.js",
+        serviceWorkerParam: {
+          scope: "/web-sdk-custom-code/"
+        }
+      });
+
+      console.log(await navigator.serviceWorker.getRegistrations());
+      console.log("Permission:", OneSignal.Notifications.permission);
+      console.log("Opted In:", OneSignal.User.PushSubscription.optedIn);
+      console.log("Subscription ID:", OneSignal.User.PushSubscription.id);
+    });
+  </script>
+
+  <!-- Customer-related Notification code -->
+
+  <script>
+    let notification
+    document.addEventListener("visibilitychange", (e) => {
+      var date = new Date();
+      const tabChangeTime = localStorage.getItem("tabChange") > 0 ? localStorage.getItem("tabChange") : 0
+      if (document.visibilityState === "hidden" && ((date.getTime() - tabChangeTime) > (1000 * 60 * 1)) || !localStorage.getItem("tabChange")) {
+        sendLocalPush()
+      } else { if (notification) { notification.close(); } }
+    })
+    function sendLocalPush() {
+      var date = new Date();
+      localStorage.setItem("tabChange", date.getTime());
+      notification = new Notification("Reach every customer!", {
+        body: "Continue exploring what you can achieve on our website. 🚀",
+        icon: "https://marclucraft.github.io/web-sdk-custom-code/os-icon.png"
+      })
+    }
+  </script>
+
 </head>
 
 <body>
